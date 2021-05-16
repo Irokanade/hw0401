@@ -56,11 +56,13 @@ int main(int argc, char *argv[]) {
                 split = 1; //split option true
                 strncpy(fileName, optarg, strlen(optarg));
                 printf("fileName: %s\n", fileName);
+                break;
             case 'r':
                 printf("option: -r, %s\n", optarg);
                 recover = 1;
                 strncpy(outFileName, optarg, strlen(optarg));
                 printf("output file name: %s\n", outFileName);
+                break;
             case 128:
                 printf("option --size, %s\n", optarg);
                 size = strtol(optarg, &pEnd, 10);
@@ -69,6 +71,7 @@ int main(int argc, char *argv[]) {
                     return 1;
                 }
                 printf("size: %ld\n", size);
+                break;
             case '?':
                 printf( "option: ?, %s\n", optarg );
                 break;
