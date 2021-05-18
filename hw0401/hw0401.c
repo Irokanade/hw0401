@@ -19,8 +19,11 @@ struct option long_options[] = {
     {"split", 1, NULL, 's'},
     {"recover", 1, NULL, 'r'},
     {"size", 1, NULL, 128}, //ascii has 127
+    {"help", 0, NULL, 129},
     { 0, 0, 0, 0},
 };
+
+void printHelp(void);
 
 int main(int argc, char *argv[]) {
     /*
@@ -48,36 +51,41 @@ int main(int argc, char *argv[]) {
     
     while ( ( c = getopt_long( argc, argv, "s:r:", long_options, &index ) ) != -1 )
     {
-        printf( "index: %d\n", index );
+        //printf( "index: %d\n", index );
         switch( c )
         {
             case 's':
-                printf("option: -s, %s\n", optarg);
+                //printf("option: -s, %s\n", optarg);
                 split = 1; //split option true
                 strncpy(fileName, optarg, strlen(optarg));
-                printf("fileName: %s\n", fileName);
+                //printf("fileName: %s\n", fileName);
                 break;
             case 'r':
-                printf("option: -r, %s\n", optarg);
+                //printf("option: -r, %s\n", optarg);
                 recover = 1;
                 strncpy(outFileName, optarg, strlen(optarg));
-                printf("output file name: %s\n", outFileName);
+                //printf("output file name: %s\n", outFileName);
                 break;
             case 128:
-                printf("option --size, %s\n", optarg);
+                //printf("option --size, %s\n", optarg);
                 size = strtol(optarg, &pEnd, 10);
                 if(pEnd == NULL) {
                     printf("Conversion unsuccessful\n");
                     return 1;
                 }
-                printf("size: %ld\n", size);
+                //printf("size: %ld\n", size);
                 break;
+            case 129:
+                printHelp();
+                return 0;
             case '?':
-                printf( "option: ?, %s\n", optarg );
-                break;
+                //printf( "option: ?, %s\n", optarg );
+                printf("invalid option use '--help' for more options\n");
+                return 1;
             default:
-                printf( "option: unknown\n" );
-                break;
+                //printf( "option: unknown\n" );
+                printf("invalid option use '--help' for more options\n");
+                return 1;
         }
     }
     
@@ -85,7 +93,7 @@ int main(int argc, char *argv[]) {
     
     for (size_t i = smolStartingIndex; i < argc; i++) {
         //remaining arguements are assumed to be input files
-        printf("non options: %s\n", argv[i]);
+        //printf("non options: %s\n", argv[i]);
     }
     
     if(split) {
@@ -111,17 +119,17 @@ int main(int argc, char *argv[]) {
         oriSize = ftell(oriFile);
         rewind(oriFile);
         
-        printf("oriSize: %ld\n", oriSize);
+        //printf("oriSize: %ld\n", oriSize);
         
         numberOfPartitions = (long double)oriSize/size;
-        printf("number of partitions: %Lf\n", numberOfPartitions);
+        //printf("number of partitions: %Lf\n", numberOfPartitions);
         if(fmod(numberOfPartitions, 1.0) != 0) {
             numberOfPartitions = (int)numberOfPartitions;
             numberOfPartitions++;
-            printf("number of partitions: %Lf\n", numberOfPartitions);
+            //printf("number of partitions: %Lf\n", numberOfPartitions);
         }
         
-        printf("sizeofchar: %ld\n", sizeof(char));
+        //printf("sizeofchar: %ld\n", sizeof(char));
         smallFileList = (FILE**)malloc(sizeof(FILE*)*numberOfPartitions);
         //buffer = (unsigned char*)malloc(sizeof(unsigned char)*size);
         
@@ -133,7 +141,7 @@ int main(int argc, char *argv[]) {
             strncat(fileNameTemp, intChar, 1);
             strncat(fileNameTemp, fileName, strlen(fileName));
             
-            printf("fileNameTemp: %s\n", fileNameTemp);
+            //printf("fileNameTemp: %s\n", fileNameTemp);
             if((smallFileList[i] = fopen(fileNameTemp, "wb")) == NULL) {
                 printf("Error opening files\n");
                 return 1;
@@ -177,7 +185,7 @@ int main(int argc, char *argv[]) {
         }
         
         numOfSmallFiles = argc - smolStartingIndex;
-        printf("numOfSmallFile: %d\n", numOfSmallFiles);
+        //printf("numOfSmallFile: %d\n", numOfSmallFiles);
         if(numOfSmallFiles > 0) {
             smallFileList = (FILE**)malloc(sizeof(FILE*)*numOfSmallFiles);
         } else {
@@ -187,7 +195,7 @@ int main(int argc, char *argv[]) {
         
         for(size_t i = 0; i < numOfSmallFiles; i++) {
             //open all the files
-            printf("small file: %s\n", argv[i+smolStartingIndex]);
+            //printf("small file: %s\n", argv[i+smolStartingIndex]);
             if((smallFileList[i] = fopen(argv[i+smolStartingIndex], "rb")) == NULL) {
                 printf("Error opening files\n");
                 return 1;
@@ -206,8 +214,8 @@ int main(int argc, char *argv[]) {
                 fread(&cardinalj, sizeof(size_t), 1, smallFileList[j]);
                 fread(&cardinaljplus1, sizeof(size_t), 1, smallFileList[j+1]);
                 
-                printf("cardinalj: %lu\n", cardinalj);
-                printf("cardinaljplus1: %lu\n", cardinaljplus1);
+                //printf("cardinalj: %lu\n", cardinalj);
+                //printf("cardinaljplus1: %lu\n", cardinaljplus1);
                 
                 if(cardinalj > cardinaljplus1) {
                     //sort file pointers
@@ -226,7 +234,7 @@ int main(int argc, char *argv[]) {
         }
         
         for(size_t i = 0; i < numOfSmallFiles; i++) {
-            printf("sorted smol files: %s\n", argv[i+smolStartingIndex]);
+            //printf("sorted smol files: %s\n", argv[i+smolStartingIndex]);
         }
         
         for(size_t i = 0; i < numOfSmallFiles; i++) {
@@ -252,4 +260,13 @@ int main(int argc, char *argv[]) {
     }
     
     return 0;
+}
+
+void printHelp() {
+    printf("___to split files___\n");
+    printf("use './hw0401 -s [input file name]' --size [size to split]\n");
+    printf("___to recover files___\n");
+    printf("use './hw0401 -r [output file]' [small files]\n");
+    printf("to reover file please input ALL the small files.\n");
+    printf("this program does not guarantee successfull recovery if not all the small files are inputed\n");
 }
