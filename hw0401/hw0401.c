@@ -13,7 +13,7 @@
 #include <string.h>
 #include <math.h>
 
-#define MIN_SIZE 1
+#define MIN_SIZE 1000
 
 struct option long_options[] = {
     {"split", 1, NULL, 's'},
@@ -101,7 +101,8 @@ int main(int argc, char *argv[]) {
         //check if size is valid
         if(size < MIN_SIZE) {
             printf("error size is less than %d\n", MIN_SIZE);
-            return 1;
+            printf("default small size if %d\n", MIN_SIZE);
+            size = MIN_SIZE;
         }
         
         FILE *oriFile = NULL;
@@ -141,12 +142,16 @@ int main(int argc, char *argv[]) {
             strncat(fileNameTemp, intChar, 1);
             strncat(fileNameTemp, fileName, strlen(fileName));
             
+            printf("%s ", fileNameTemp);
+            
             //printf("fileNameTemp: %s\n", fileNameTemp);
             if((smallFileList[i] = fopen(fileNameTemp, "wb")) == NULL) {
                 printf("Error opening files\n");
                 return 1;
             }
         }
+        
+        printf("\n");
         
         for(size_t i = 0; i < oriSize; i += size) {
             //first write the numbering
@@ -162,6 +167,7 @@ int main(int argc, char *argv[]) {
             }
             //printf("\n");
         }
+        
         
         //free all pointers
         free(smallFileList);
@@ -234,7 +240,7 @@ int main(int argc, char *argv[]) {
         }
         
         for(size_t i = 0; i < numOfSmallFiles; i++) {
-            //printf("sorted smol files: %s\n", argv[i+smolStartingIndex]);
+            //printf("%s ", argv[i+smolStartingIndex]);
         }
         
         for(size_t i = 0; i < numOfSmallFiles; i++) {
@@ -267,6 +273,6 @@ void printHelp() {
     printf("use './hw0401 -s [input file name]' --size [size to split]\n");
     printf("___to recover files___\n");
     printf("use './hw0401 -r [output file]' [small files]\n");
-    printf("to reover file please input ALL the small files.\n");
+    printf("to recover file please input ALL the small files.\n");
     printf("this program does not guarantee successfull recovery if not all the small files are inputed\n");
 }
