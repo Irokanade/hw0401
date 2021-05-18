@@ -101,7 +101,7 @@ int main(int argc, char *argv[]) {
         //check if size is valid
         if(size < MIN_SIZE) {
             printf("error size is less than %d\n", MIN_SIZE);
-            printf("default small size if %d\n", MIN_SIZE);
+            printf("default small size is %d\n", MIN_SIZE);
             size = MIN_SIZE;
         }
         
